@@ -4,12 +4,13 @@
   "description": "split word up into its component roots to better understand word origins",
   "main": "index.js",
   "dependencies": {
-    "requirejs": "^2.3.2",
-		"express": "4.14.0"
+    "express": "4.14.0",
+    "node-json2html": "^1.1.1",
+    "requirejs": "^2.3.2"
   },
   "devDependencies": {},
   "scripts": {
-		"start": "node index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

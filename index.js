@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var json2html = require('node-json2html')
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -10,12 +11,48 @@ app.set('port', (process.env.PORT || 5000));
 //app.set('view engine', 'ejs');
 //
 app.get('/', function(request, response) {
-  response.send ("learn biology project! - look in console");
+  console.log('/ called');
+	
+	
+	// create html on the fly from json object 
+	var html = 	'<h1>learn biology project!</h1>' +
+							'		<h2> How to use? </h2>' + 
+							'			<div>	type in /findRoots/[wordToLookUp] <div>';
+					
+							
+	
+  response.send (html);
 	
 });
 
+app.get('/test_acus', function(request, response) {
+	response.send (" way to return for /test-acus)");
+});
+app.get('/findRoots/:word', function(request, response) {
+		
+	// create html on the fly from json object using JSON2HTML
+	//	 http://json2html.com/#tabs
+	var html = '<h2>'+request.params.word+'</h2>'
+	
+	var transform = {"<>":"div","id":"${_variation}","html":[
+										{"<>":"div","html":"<b>${_variation}</b>"},
+										{"<>":"div","html":"${_root}"},
+										{"<>":"div","html":"[${_language}]"},
+										{"<>":"div","html":" ${_meaning}</i>"},
+										{"<>":"div","html":"<br>"}
+									]}
+
+	var roots = findRoots(request.params.word, dictionaryOfRootEntries);
+	html += json2html.transform(roots,transform);
+	
+  response.send(html);
+});
+
 app.listen(app.get('port'), function() {
-  console.log('Node app is running on port', app.get('port'));
+  console.log('/////////// ----');
+  console.log('//    Node app is running on port', app.get('port'));
+  console.log('/////////// ----');
+
 });
 
 
@@ -25,8 +62,6 @@ app.listen(app.get('port'), function() {
 /////////////////////////////////////////////////////////
 // Getting the raw data from relative file path
 //////////////////////////
-
-
 var fs = require('fs');
 var path = require('path');
 
@@ -47,13 +82,13 @@ console.log(" *CALL: cleanRawDictionary -----");
 var dictionaryOfRootEntries = cleanRawDictionary(inputDictionaryToClean);
 
 
-console.log(" *CALL: findRoots -----");
+//console.log(" *CALL: findRoots -----");
 //console.log(findRoots("abdicate",dictionaryOfRootEntries));			// TEST basic test, one result
 //console.log(findRoots("adolescence",dictionaryOfRootEntries));
 //console.log(findRoots("actuary",dictionaryOfRootEntries));
-console.log(findRoots("acus",dictionaryOfRootEntries));					// TEST against =acus
-console.log(findRoots("agnus",dictionaryOfRootEntries));				// TEST against agn, -i, =us
-console.log(findRoots("myostatin",dictionaryOfRootEntries));				
+//console.log(findRoots("acus",dictionaryOfRootEntries));					// TEST against =acus
+//console.log(findRoots("agnus",dictionaryOfRootEntries));				// TEST against agn, -i, =us
+//console.log(findRoots("myostatin",dictionaryOfRootEntries));				
 
 console.log("************* END OF MAIN");
 
@@ -62,13 +97,13 @@ console.log("************* END OF MAIN");
 // FUNCTIONS
 //		== 	Initialization
 //				Dictionary Setup
-function DictionaryEntry(root,language,meaning) {
-    this._root = root;
+function DictionaryEntry(root,language,meaning) {			// js object, treated like struct
+    this._root = root;																// *notice uppercase naming convention
     this._language = language;
     this._meaning = meaning;
-				
-    
 }
+
+
 function cleanRawDictionary(dictionaryToClean){
 	var returnValue = "TODO_cleanDictionaryReturnVALUE";
 	console.log (" -- DEBUG: dictionaryToClean START");
@@ -155,7 +190,7 @@ function cleanRawDictionary(dictionaryToClean){
 //				
 
 function findRoots(wordToCheck, dictionaryToCheckAgainst) {
-		var returnValue = 0;
+		var returnValue = [];
 	
 		// TODO - look up all posibile comibinations of root on this, return all hits
 	
@@ -219,7 +254,13 @@ function findRoots(wordToCheck, dictionaryToCheckAgainst) {
 						console.log("-       [root]: " + curObj._root);
 						console.log("-       [lang]: " + curObj._language);
 						console.log("-    [meaning]: " + curObj._meaning);
-						returnValue++;
+						
+						var newHit = new DictionaryHitResponseObject (variations[z], 
+																													curObj._root,
+																													curObj._language,
+																													curObj._meaning);
+						
+						returnValue.push(newHit);
 						break;
 					}
 				}
@@ -228,8 +269,13 @@ function findRoots(wordToCheck, dictionaryToCheckAgainst) {
 	
 		//console.log(lookupRoot(wordToCheck));
     
-	// TODO - return object needs to be json with all the info to be used on a website
-	returnValue = "- Found " + returnValue + " match!\n";
 	
   return returnValue;
+}
+
+function DictionaryHitResponseObject(variation,root,language,meaning) {	
+		this._variation = variation;											// js object, treated like struct
+    this._root = root;																// *notice uppercase naming convention
+    this._language = language;
+    this._meaning = meaning;
 }
