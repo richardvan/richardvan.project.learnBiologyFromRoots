@@ -1,0 +1,24 @@
+{
+  "name": "learn-biology-from-roots",
+  "version": "1.0.0",
+  "description": "split word up into its component roots to better understand word origins",
+  "main": "index.js",
+  "dependencies": {
+    "googleapis": "^14.1.0",
+    "requirejs": "^2.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/richardvan/richardvan.project.learnBiologyFromRoots.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/richardvan/richardvan.project.learnBiologyFromRoots/issues"
+  },
+  "homepage": "https://github.com/richardvan/richardvan.project.learnBiologyFromRoots#readme"
+}
