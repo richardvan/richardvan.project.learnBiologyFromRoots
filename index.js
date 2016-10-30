@@ -25,17 +25,20 @@ var dictionaryOfRootEntries = cleanRawDictionary(inputDictionaryToClean);
 
 
 console.log(" *CALL: findRoots -----");
-console.log(findRoots("abdicate",dictionaryOfRootEntries));
-console.log(findRoots("adolescence",dictionaryOfRootEntries));
-console.log(findRoots("actuary",dictionaryOfRootEntries));
+//console.log(findRoots("abdicate",dictionaryOfRootEntries));			// TEST basic test, one result
+//console.log(findRoots("adolescence",dictionaryOfRootEntries));
+//console.log(findRoots("actuary",dictionaryOfRootEntries));
 console.log(findRoots("acus",dictionaryOfRootEntries));					// TEST against =acus
 console.log(findRoots("agnus",dictionaryOfRootEntries));				// TEST against agn, -i, =us
+console.log(findRoots("myostatin",dictionaryOfRootEntries));				
 
 console.log("************* END OF MAIN");
 
 
 ////////
-// NEW FUNCTIONS
+// FUNCTIONS
+//		== 	Initialization
+//				Dictionary Setup
 function DictionaryEntry(root,language,meaning) {
     this._root = root;
     this._language = language;
@@ -67,6 +70,13 @@ function cleanRawDictionary(dictionaryToClean){
 	for (var key in dictionaryToClean)
 	{
 //  	console.log("key: %s, value: %s", key, dictionaryToClean[key])
+		
+		// skip spaces
+		if (dictionaryToClean[key] == "")
+		{
+//			console.log("**Blank Line**");
+			continue;
+		}
 		
 		
 		// there are no * or «, misread as =
@@ -101,7 +111,7 @@ function cleanRawDictionary(dictionaryToClean){
 	}
 	
 //	console.log (" -- DEBUG: dictionaryToClean after FIRST CLEAN");
-	console.log (dictionaryFormattedAsEntries);
+//	console.log (dictionaryFormattedAsEntries);
 	console.log ("    LENGTH: " + dictionaryFormattedAsEntries.length);
 
 
@@ -116,16 +126,10 @@ function cleanRawDictionary(dictionaryToClean){
 
 
 
-
-
-/////////////////////////
-//							HELPER FUNCTIONS
-/////////////////////////
-
-//Short code - REGEX from http://stackoverflow.com/questions/26246601/wildcard-string-comparison-in-javascript
-function matchRuleShort(str, rule) {
-  return new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
-}
+////////
+// FUNCTIONS
+//		== 	Main Routines
+//				
 
 function findRoots(wordToCheck, dictionaryToCheckAgainst) {
 		var returnValue = 0;
@@ -135,65 +139,74 @@ function findRoots(wordToCheck, dictionaryToCheckAgainst) {
 		// see if root is a subscript of wordToCheck
 		var foundAtLeastOne = false;
 		for (var i = 0, len = dictionaryToCheckAgainst.length; i < len; i++) {
-				var currentObject = dictionaryToCheckAgainst[i];
-				var currentObjectRootToCheckAgainst = currentObject._root;
+				var curObj = dictionaryToCheckAgainst[i];
 				
+//				console.log("dictionary[i]: " + curObj._root);
 				// root might be a single word (ex. '=acus'
 																					// acus (possible on its own
-				if (currentObjectRootToCheckAgainst.charAt(0) == '=' ||
-						currentObjectRootToCheckAgainst.charAt(0) == '-' )
+				if (curObj._root.charAt(0) == '=' ||
+						curObj._root.charAt(0) == '-' )
 					 
 				{
-					currentObjectRootToCheckAgainst = currentObjectRootToCheckAgainst.substring(1, currentObjectRootToCheckAgainst.length);
+					curObj._root = curObj._root.substring(1, curObj._root.length);
 				}
 			
 				// root might have variations (ex.  'aeti, =a, -o' )
 																					//  aeti
 																					//  aetia (more likely because of =)
 																					//  aetio
-				var splits = currentObjectRootToCheckAgainst.split(', '); // split on ', '
-				var variations = "";
-				if (splits.length == 1)
-					variations = currentObjectRootToCheckAgainst;
-				else
+				var variations = [];	
+				var splits = curObj._root.split(', '); // split on ', '
+				
+//				console.log ("--splits: " + splits);
+				
+				if (splits.length == 1)						// no variations
+					variations.push (curObj._root); 							
+				else															// variations exist
 				{
-//					console.log ("--splits: " + splits);
-					variations = []; 	// one variation will always be the first term
-					variations.push (splits[0]);
+					variations.push (splits[0]);		// base type is variations
 					
-//					console.log ("--variations (with splits): " + variations);
 					for (var j=1; j<splits.length; j++)
 					{
-						var currentVariation = splits[j];
-//						console.log("  [currentVariation] " + currentVariation);
-						variations.push (splits[0] + currentVariation.substring(1,currentVariation.length));
+//						console.log("  [currentVariation] " + splits[0] + splits[j].substring(1,splits[j].length));
+						variations.push (splits[0] + splits[j].substring(1,splits[j].length));
 					}
 				}
 			
 			
 //				console.log ("--finalVariations: " + variations);
-				// check each variation, at a minimum there will be one
-					
 			
-				if (currentObject._root.length > 1 && 								// skipping single letter
-						wordToCheck.indexOf(currentObjectRootToCheckAgainst) > -1 )
+			
+				////////////////
+				//		CHECK EACH VARIATION HERE FOR MATCH
+				////////////////			
+				// at a minimum there will be one (the base)
+				// check backwards so if there is a hit, it's more specific
+				for (var z=variations.length-1; z>=0 ; z--)
 				{
-					if (!foundAtLeastOne)
+					if (variations[z].length > 1 && 											// skipping single letter
+							wordToCheck.indexOf(variations[z]) > -1 )					// is root or subscript of
 					{
-						console.log("--[wordToCheck]: " + wordToCheck);					// display once
-						foundAtLeastOne = true;
+						if (!foundAtLeastOne)
+						{
+							console.log("-[wordToCheck]: " + wordToCheck);	// display once
+							foundAtLeastOne = true;
+						}
+						console.log("-  [variation]: " + variations[z]);
+						console.log("-       [root]: " + curObj._root);
+						console.log("-       [lang]: " + curObj._language);
+						console.log("-    [meaning]: " + curObj._meaning);
+						returnValue++;
+						break;
 					}
-					console.log("-   [root]: " + currentObject._root);
-					console.log("-    [lang]: " + currentObject._language);
-					console.log("-    [meaning]: " + currentObject._meaning);
-					returnValue++;
 				}
 
 		}
 	
 		//console.log(lookupRoot(wordToCheck));
     
-	returnValue = "----- Found " + returnValue + " match!\n";
+	// TODO - return object needs to be json with all the info to be used on a website
+	returnValue = "- Found " + returnValue + " match!\n";
 	
   return returnValue;
 }
