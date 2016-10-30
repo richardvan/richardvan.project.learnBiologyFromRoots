@@ -4,7 +4,6 @@
   "description": "split word up into its component roots to better understand word origins",
   "main": "index.js",
   "dependencies": {
-    "googleapis": "^14.1.0",
     "requirejs": "^2.3.2"
   },
   "devDependencies": {},
