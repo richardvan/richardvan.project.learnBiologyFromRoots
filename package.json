@@ -4,7 +4,8 @@
   "description": "split word up into its component roots to better understand word origins",
   "main": "index.js",
   "dependencies": {
-    "requirejs": "^2.3.2"
+    "requirejs": "^2.3.2",
+		"express": "4.14.0"
   },
   "devDependencies": {},
   "scripts": {
