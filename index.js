@@ -108,7 +108,7 @@ function onListening() {
 //app.set('views', __dirname + '/views');
 //app.set('view engine', 'ejs');
 app.get('/javascripts/bundle.js', browserify('./client/script.js'));	//browserify setup
-if (app.get('env') == 'development') {																//browser-sync setup
+if (app.get('env') === 'development') {																//browser-sync setup
   var browserSync = require('browser-sync');
   var config = {
     files: ["public/**/*.{js,css}", "client/*.js", "sass/**/*.scss", "views/**/*.jade"],
@@ -155,15 +155,6 @@ app.get('/findRoots/:word', function(request, response) {
 	
   response.send(html);
 });
-
-
-app.get('/learnWord/:word', function(request, response) {
-  console.log('[calling..] /learnWord/'+request.params.word);
-	
-
-  response.send(html);
-});
-
 
 
 
@@ -269,7 +260,7 @@ function cleanRawDictionary(dictionaryToClean){
 //  	console.log("key: '%s, value: '%s", key, dictionaryToClean[key])
 		
 		// skip spaces
-		if (dictionaryToClean[key] == "")
+		if (dictionaryToClean[key] === "")
 		{
 //			console.log("**Blank Line**");
 			continue;
@@ -286,7 +277,7 @@ function cleanRawDictionary(dictionaryToClean){
 		var matches = regExp.exec(dictionaryToClean[key]);
 		//		matches[1]  contains the value between the parentheses
 		//					  		otherwise null means it is multiline
-		if (matches == null || matches[1] == null)
+		if (matches === null || matches[1] === null)
 		{
 //			console.log(" : 'this is MULTILINE");
 			// previous value will be on top of list
@@ -353,8 +344,8 @@ function findRoots(wordToCheck, dictionaryToCheckAgainst) {
 //				console.log("dictionary[i]: '" + curObj._root);
 				// root might be a single word (ex. '=acus'
 																					// acus (possible on its own
-				if (curObj._root.charAt(0) == '=' ||
-						curObj._root.charAt(0) == '-' )
+				if (curObj._root.charAt(0) === '=' ||
+						curObj._root.charAt(0) === '-' )
 					 
 				{
 					curObj._root = curObj._root.substring(1, curObj._root.length);
@@ -369,8 +360,10 @@ function findRoots(wordToCheck, dictionaryToCheckAgainst) {
 				
 //				console.log ("--splits: '" + splits);
 				
-				if (splits.length == 1)						// no variations
-					variations.push (curObj._root); 							
+				if (splits.length === 1)						// no variations
+				{
+					variations.push (curObj._root);
+				}
 				else															// variations exist
 				{
 					variations.push (splits[0]);		// base type is variations
